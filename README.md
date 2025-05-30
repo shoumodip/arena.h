@@ -1,4 +1,4 @@
-# Arena
+# arena.h
 Arena in C.
 
 ## Quick Start
