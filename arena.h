@@ -23,6 +23,10 @@
 
 #include <stddef.h>
 
+#ifndef ARENA_API
+#    define ARENA_API
+#endif // ARENA_API
+
 #ifndef ARENA_MINIMUM_CAPACITY
 #    define ARENA_MINIMUM_CAPACITY 16000
 #endif // ARENA_MINIMUM_CAPACITY
@@ -33,8 +37,8 @@ typedef struct {
     ArenaRegion *head;
 } Arena;
 
-void  arena_free(Arena *a);
-void *arena_alloc(Arena *a, size_t size);
+ARENA_API void  arena_free(Arena *a);
+ARENA_API void *arena_alloc(Arena *a, size_t size);
 
 #endif // ARENA_H
 
@@ -49,7 +53,7 @@ struct ArenaRegion {
     char         data[];
 };
 
-void arena_free(Arena *a) {
+ARENA_API void arena_free(Arena *a) {
     ArenaRegion *it = a->head;
     while (it) {
         ArenaRegion *next = it->next;
@@ -58,7 +62,7 @@ void arena_free(Arena *a) {
     }
 }
 
-void *arena_alloc(Arena *a, size_t size) {
+ARENA_API void *arena_alloc(Arena *a, size_t size) {
     ArenaRegion *region = NULL;
     for (ArenaRegion *it = a->head; it; it = it->next) {
         if (it->count + size <= it->capacity) {
