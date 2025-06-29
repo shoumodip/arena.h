@@ -38,6 +38,7 @@ typedef struct {
 } Arena;
 
 ARENA_API void  arena_free(Arena *a);
+ARENA_API void  arena_reset(Arena *a, const void *ptr);
 ARENA_API void *arena_alloc(Arena *a, size_t size);
 
 #endif // ARENA_H
@@ -60,6 +61,23 @@ ARENA_API void arena_free(Arena *a) {
         free(it);
         it = next;
     }
+}
+
+ARENA_API void arena_reset(Arena *a, const void *ptr) {
+    for (ArenaRegion *it = a->head; it; it = it->next) {
+        if ((const char *) ptr >= it->data && (const char *) ptr < it->data + it->capacity) {
+            it->count = (const char *) ptr - it->data;
+            for (ArenaRegion *p = a->head; p != it;) {
+                ArenaRegion *next = p->next;
+                free(p);
+                p = next;
+            }
+            a->head = it;
+            return;
+        }
+    }
+
+    abort();
 }
 
 ARENA_API void *arena_alloc(Arena *a, size_t size) {
